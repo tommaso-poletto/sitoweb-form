@@ -1,0 +1,356 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core Brand Colors - Forest Green Primary */
+    --forest-green: 152 42% 18%;
+    --forest-green-light: 152 35% 25%;
+    --forest-green-dark: 152 45% 12%;
+
+    /* Persimmon Accent - Energy & CTAs */
+    --persimmon: 20 95% 58%;
+    --persimmon-light: 20 95% 65%;
+    --persimmon-dark: 20 95% 50%;
+
+    /* Neutral Backgrounds - Warm Cream */
+    --background: 40 33% 96%;
+    --background-subtle: 40 30% 94%;
+    --background-muted: 40 25% 92%;
+
+    /* Foreground Colors */
+    --foreground: 152 42% 18%;
+    --foreground-muted: 152 20% 35%;
+    --foreground-subtle: 152 15% 50%;
+
+    /* Card Styling - Floating Islands */
+    --card: 0 0% 100%;
+    --card-foreground: 152 42% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 152 42% 18%;
+
+    /* Primary = Forest Green for trust */
+    --primary: 152 42% 18%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary = Persimmon for CTAs & highlights */
+    --secondary: 20 95% 58%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted for subtle backgrounds */
+    --muted: 40 15% 96%;
+    --muted-foreground: 152 20% 45%;
+
+    /* Accent = Persimmon lighter */
+    --accent: 20 95% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders - Very subtle */
+    --border: 40 20% 92%;
+    --input: 40 20% 92%;
+    --ring: 152 42% 18%;
+
+    /* Tech Warmth Radius - Deeply rounded */
+    --radius: 1rem;
+    --radius-lg: 1.5rem;
+    --radius-xl: 2rem;
+    --radius-2xl: 2.5rem;
+    --radius-pill: 9999px;
+
+    /* Shadows - Soft, diffused */
+    --shadow-sm: 0 2px 8px -2px hsl(152 42% 18% / 0.06);
+    --shadow-md: 0 8px 24px -6px hsl(152 42% 18% / 0.1);
+    --shadow-lg: 0 16px 48px -12px hsl(152 42% 18% / 0.12);
+    --shadow-xl: 0 24px 64px -16px hsl(152 42% 18% / 0.15);
+    --shadow-glow: 0 0 40px -8px hsl(20 95% 58% / 0.3);
+
+    /* Sidebar (keeping for compatibility) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 152 42% 18%;
+    --sidebar-primary: 152 42% 18%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 15% 96%;
+    --sidebar-accent-foreground: 152 42% 18%;
+    --sidebar-border: 40 20% 92%;
+    --sidebar-ring: 152 42% 18%;
+  }
+
+  .dark {
+    --background: 152 45% 8%;
+    --background-subtle: 152 40% 10%;
+    --background-muted: 152 35% 12%;
+
+    --foreground: 40 20% 98%;
+    --foreground-muted: 40 15% 80%;
+    --foreground-subtle: 40 10% 60%;
+
+    --card: 152 40% 10%;
+    --card-foreground: 40 20% 98%;
+
+    --popover: 152 40% 10%;
+    --popover-foreground: 40 20% 98%;
+
+    --primary: 20 95% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 152 42% 18%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 152 35% 15%;
+    --muted-foreground: 40 15% 70%;
+
+    --accent: 20 95% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 152 30% 18%;
+    --input: 152 30% 18%;
+    --ring: 20 95% 58%;
+
+    --sidebar-background: 152 45% 8%;
+    --sidebar-foreground: 40 20% 98%;
+    --sidebar-primary: 20 95% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 152 35% 15%;
+    --sidebar-accent-foreground: 40 20% 98%;
+    --sidebar-border: 152 30% 18%;
+    --sidebar-ring: 20 95% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-semibold tracking-tight text-primary;
+  }
+}
+
+@layer components {
+  /* Floating Island Navbar */
+  .nav-island {
+    @apply fixed top-6 left-1/2 -translate-x-1/2 z-50 
+           bg-white/90 backdrop-blur-xl 
+           rounded-pill px-2 py-2
+           border border-white/20;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Tech Warmth Cards */
+  .card-warm {
+    @apply bg-white rounded-2xl p-6 lg:p-8;
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-warm-hover {
+    @apply card-warm transition-all duration-300 ease-out;
+  }
+
+  .card-warm-hover:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-4px);
+  }
+
+  /* Feature Bento Grid */
+  .bento-grid {
+    @apply grid gap-4 lg:gap-6;
+  }
+
+  /* CTA Button Glow */
+  .btn-glow {
+    @apply relative overflow-hidden;
+  }
+
+  .btn-glow::before {
+    content: "";
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: radial-gradient(
+      circle at center,
+      hsl(var(--persimmon) / 0.3) 0%,
+      transparent 70%
+    );
+  }
+
+  .btn-glow:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Phone Mockup Frame */
+  .phone-frame {
+    @apply relative bg-foreground rounded-[40px] p-3;
+    box-shadow:
+      var(--shadow-xl),
+      inset 0 0 0 2px hsl(var(--foreground) / 0.1);
+  }
+
+  .phone-screen {
+    @apply bg-background-subtle rounded-[32px] overflow-hidden;
+  }
+
+  .phone-notch {
+    @apply absolute top-3 left-1/2 -translate-x-1/2 
+           w-24 h-6 bg-foreground rounded-full z-10;
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--forest-green)) 0%,
+      hsl(var(--persimmon)) 100%
+    );
+  }
+
+  /* Section spacing */
+  .section-padding {
+    @apply py-20 lg:py-32;
+  }
+
+  .container-narrow {
+    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-wide {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  /* Animation utilities */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+  }
+
+  .animate-scan {
+    animation: scan 2s ease-in-out infinite;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes scan {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(100%);
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-warm {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--background-subtle)) 0%,
+      hsl(var(--background)) 100%
+    );
+  }
+
+  .bg-gradient-hero {
+    background:
+      radial-gradient(
+        ellipse at top,
+        hsl(var(--persimmon) / 0.05) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at bottom left,
+        hsl(var(--forest-green) / 0.03) 0%,
+        transparent 50%
+      );
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl;
+  }
+
+  /* Hide scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

@@ -1,0 +1,112 @@
+
+# GUIDA AL DEPLOY E IMPLEMENTAZIONE SMTP
+
+Questa guida copre i passaggi necessari per mettere online il database, il sito e implementare l'invio di email transazionali (SMTP).
+
+## 1. Configurazione Database (Supabase)
+
+1.  Crea un nuovo progetto su [Supabase](https://supabase.com).
+2.  Vai nella sezione **SQL Editor** del tuo progetto.
+3.  Copia l'intero contenuto del file `supabase_schema.sql` presente in questo repository.
+4.  Incolla il codice nell'editor SQL di Supabase ed esegui ("Run") per creare tutte le tabelle e inserire i dati iniziali.
+
+## 2. Configurazione Variabili d'Ambiente
+
+1.  Nel progetto Supabase, vai su **Project Settings** -> **API**.
+2.  Copia l'URL del progetto (`Project URL`) e la chiave pubblica (`anon` `public`).
+3.  Nel tuo progetto locale, rinomina il file `.env.example` in `.env` (se non l'hai già fatto) o crealo.
+4.  Inserisci i valori copiati:
+
+    ```env
+    VITE_SUPABASE_URL=https://tuo-project-id.supabase.co
+    VITE_SUPABASE_ANON_KEY=tua-chiave-anon-public
+    ```
+
+## 3. Messa Online del Sito (Frontend)
+
+Il metodo consigliato è usare **Vercel** o **Netlify**.
+
+### Vercel (Consigliato)
+
+1.  Crea un account su Vercel e installa la CLI o collega il tuo account GitHub.
+2.  Importa il repository di questo progetto.
+3.  Nelle impostazioni del progetto su Vercel, vai su **Environment Variables**.
+4.  Aggiungi le stesse variabili che hai nel file `.env` (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`).
+5.  Fai partire il deploy. Vercel rileverà automaticamente che è un progetto Vite/React.
+
+## 4. Implementazione SMTP per Email (Importante)
+
+Per inviare email automatiche (es. conferma iscrizione lista d'attesa o accesso beta), Supabase da solo gestisce solo le mail di autenticazione. Per mail personalizzate, devi usare un provider SMTP esterno.
+
+**Provider Consigliato:** [Resend](https://resend.com) (Facile da usare, piano gratuito generoso) o SendGrid.
+
+### Strategia di Implementazione
+
+Hai due opzioni principali per inviare le email:
+
+#### Opzione A: Supabase Edge Functions (Consigliata per sicurezza)
+
+Questa opzione è più sicura perché le chiavi API dell'email rimangono sul server.
+
+1.  Installa la Supabase CLI in locale.
+2.  Crea una nuova funzione: `supabase functions new send-welcome-email`.
+3.  Nel codice della funzione, usa l'SDK del provider (es. Resend) per inviare la mail.
+
+    *Esempio logico:*
+    ```typescript
+    // Esempio pseudo-codice per Edge Function
+    import { Resend } from 'resend';
+    
+    const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+    
+    Deno.serve(async (req) => {
+      const { email } = await req.json();
+      const { data, error } = await resend.emails.send({
+        from: 'FWDRI <team@fwdri.com>',
+        to: [email],
+        subject: 'Benvenuto in FWDRI!',
+        html: '<strong>Grazie per esserti iscritto alla lista d\'attesa!</strong>',
+      });
+      // ... gestione risposta
+    });
+    ```
+4.  Configura un **Database Webhook** su Supabase:
+    *   Vai su Database -> Webhooks.
+    *   Crea un webhook che si attiva su `INSERT` nella tabella `users` o `submissions`.
+    *   Imposta il webhook per chiamare la tua Edge Function.
+    *   In questo modo, appena un utente viene salvato nel DB, parte l'email automaticamente.
+
+#### Opzione B: Chiamata API dal Frontend (Meno sicura se non protetta)
+
+Puoi chiamare le API di Resend direttamente, ma **NON esporre mai la chiave API privata nel codice frontend**.
+Se usi Vercel, puoi creare una API Route (`/api/send-email`) che fa da proxy sicuro.
+
+1.  Crea un file `api/send-email.ts` (se usi Vercel Functions).
+2.  Il frontend chiama `/api/send-email` dopo il successo del form:
+    ```javascript
+    // src/components/sections/WaitlistForm.tsx
+    // Dopo await logEvent(...)
+    await fetch('/api/send-email', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+    ```
+
+### Checklist Implementazione SMTP
+
+1.  [ ] Registrati su Resend.com e ottieni la API Key.
+2.  [ ] Verifica il dominio del mittente (es. `fwdri.com`) su Resend.
+3.  [ ] Crea il template HTML della mail di benvenuto.
+4.  [ ] Scegli l'Opzione A (Edge Function + Webhook) per la massima affidabilità:
+    *   L'utente compila il form -> Dato salvato in Supabase.
+    *   Supabase Webhook -> Attiva Edge Function.
+    *   Edge Function -> Invia mail via Resend.
+5.  [ ] Salva la chiave API di Resend nelle variabili d'ambiente di Supabase (o Vercel).
+
+---
+
+**Nota sulle Ottimizzazioni:**
+Il codice attuale è già ben strutturato (React + Vite + Tailwind). Le principali ottimizzazioni future dovrebbero concentrarsi su:
+-   **Lazy Loading**: Caricare i componenti pesanti (come i modelli 3D o animazioni complesse se presenti) solo quando visibili, ma l'attuale uso di `framer-motion` `whileInView` gestisce già bene l'aspetto visivo.
+-   **Tipi TypeScript**: Migliorare la tipizzazione in `src/lib/api.ts` rimuovendo i `@ts-ignore` una volta che il DB è stabile, usando `supabase gen types`.
+
